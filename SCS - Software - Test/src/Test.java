@@ -1,6 +1,4 @@
-package iteration1;
-
-public class Iteration1
+public class Test
 {
     public static void main(String[] args)
     {
