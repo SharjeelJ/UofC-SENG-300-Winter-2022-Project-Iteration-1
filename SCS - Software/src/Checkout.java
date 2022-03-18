@@ -1,7 +1,7 @@
-import org.lsmr.selfcheckout.devices.ElectronicScale;
+import org.lsmr.selfcheckout.devices.SelfCheckoutStation;
 import java.util.Scanner;
-
-import javax.smartcardio.Card;
+import java.math.BigDecimal;
+import java.util.Currency;
 
 public class Checkout 
 {
@@ -10,11 +10,24 @@ public class Checkout
     int sensitivity;
     int totalToBePaid;
     int paid = 0;
-    ElectronicScale a = new ElectronicScale(weightLimitInGrams, sensitivity);
+    Currency currency;
+    int[] banknoteDenominations;
+    BigDecimal[] coinDenomination;
+    SelfCheckoutStation test = new SelfCheckoutStation(currency, banknoteDenominations, coinDenominations, weightLimitInGrams, sensitivity);
 
-    public void disableScanner()
+    public void setCurrency(Currency a)
     {
-        a.disable();
+        currency = a;
+    }
+
+    public void setBD(int[] a)
+    {
+        banknoteDenominations = a;
+    }
+
+    public void setCD(BigDecimal[] a)
+    {
+        coinDenomination = a;
     }
 
     public void setWLIG(int a)
@@ -27,14 +40,9 @@ public class Checkout
         sensitivity = a;
     }
        
-    public void getPayType()
-    {   Scanner in = new Scanner(System.in);
-
-        //broke up cash and coins for testsing each
-        System.out.println("select payment type, 1 = card, 2 = cash, 3 = coins");
-
-        paymentType = in.nextInt();
-        in.close();
+    public void setPayType(int a)
+    {   
+        paymentType = a;
     }
 
     public void setTTBP(int a)
@@ -44,7 +52,6 @@ public class Checkout
 
     public void checkoutMain()
     {
-        disableScanner();
         switch(paymentType)
         {
             case 1:
