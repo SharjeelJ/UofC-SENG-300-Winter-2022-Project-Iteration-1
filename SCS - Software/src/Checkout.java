@@ -1,55 +1,36 @@
-import org.lsmr.selfcheckout.devices.SelfCheckoutStation;
-import java.util.Scanner;
-import java.math.BigDecimal;
-import java.util.Currency;
-
 public class Checkout 
 {
     int paymentType = 0;
-    int weightLimitInGrams;
-    int sensitivity;
     int totalToBePaid;
     int paid = 0;
-    Currency currency;
-    int[] banknoteDenominations;
-    BigDecimal[] coinDenomination;
-    SelfCheckoutStation test = new SelfCheckoutStation(currency, banknoteDenominations, coinDenominations, weightLimitInGrams, sensitivity);
+    boolean sucessfulTransaction = false;
 
-    public void setCurrency(Currency a)
-    {
-        currency = a;
-    }
 
-    public void setBD(int[] a)
+    public void setPaymentType(int a)
     {
-        banknoteDenominations = a;
-    }
-
-    public void setCD(BigDecimal[] a)
-    {
-        coinDenomination = a;
-    }
-
-    public void setWLIG(int a)
-    {
-        weightLimitInGrams = a;
-    }
-
-    public void setSensitivity(int a)
-    {
-        sensitivity = a;
-    }
-       
-    public void setPayType(int a)
-    {   
         paymentType = a;
     }
 
-    public void setTTBP(int a)
+    public void setTotalToBePaid(int a)
     {
         totalToBePaid = a;
+    }    
+
+    public void calcPaid()
+    {
+
     }
 
+    public void calcTotalToBePaid()
+    {
+
+    }
+
+    public void cancelTransaction()
+    {
+        
+    }
+    
     public void checkoutMain()
     {
         switch(paymentType)
@@ -64,12 +45,7 @@ public class Checkout
                 //pay with cash
                 break;
             }
-            case 3:
-            {
-                //pay with coins
-                break;
-            }
+
         }
     }
-
 }
