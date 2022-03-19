@@ -32,12 +32,12 @@ public class ScanItem {
     // implementing observer
     private class SI implements BarcodeScannerObserver {
         @Override
-        public void enabled(AbstractDevice<? extends AbstractDeviceObserver>)
+        public void enabled(AbstractDevice<? extends AbstractDeviceObserver>device)
         {
 
         }
         
-        public void disabled(AbstractDevice<? extends AbstractDeviceObserver>)
+        public void disabled(AbstractDevice<? extends AbstractDeviceObserver>device)
         {
 
         }
