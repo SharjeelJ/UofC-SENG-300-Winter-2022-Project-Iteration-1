@@ -4,13 +4,15 @@ import org.lsmr.selfcheckout.devices.observers.AbstractDeviceObserver;
 import org.lsmr.selfcheckout.devices.observers.ElectronicScaleObserver;
 
 public class Checkout implements ElectronicScaleObserver
+
 {
     int paymentType = 0;
-    int totalToBePaid;
-    int paid = 0;
+    double totalToBePaid;
+    double paid = 0;
     boolean sucessfulTransaction = false;
 
- 
+    PayBanknote payB = new PayBanknote();
+    coinUSE payC = new coinUSE();
 
     public void setPaymentType(int a)
     {
@@ -22,9 +24,10 @@ public class Checkout implements ElectronicScaleObserver
         totalToBePaid = a;
     }    
 
-    public void calcPaidCB()
+    public double calcPaidCB()
     {
-
+        paid += payB.getTotalBanknotes();
+        //paid += payC.
     }
 
     public void calcTotalToBePaid()
@@ -48,7 +51,8 @@ public class Checkout implements ElectronicScaleObserver
             }
             case 2:
             {
-                PayBanknote.PayBankote();
+                if(calcPaidCB() >= totalToBePaid)
+                
                 //pay with cash
                 break;
             }
