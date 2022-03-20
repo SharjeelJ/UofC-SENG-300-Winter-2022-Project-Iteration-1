@@ -1,3 +1,12 @@
+/**
+ * AUTHOR: SAMI TAHA
+ * UCID: 30124214
+ * PURPOSE: This code is designed to implement all abstract methods in Observer interfaces related to paying with Banknotes. 
+ * This implementation consists of an ArrayList that keeps track of all validated banknotes, status flags that are indicative of the state of
+ * the banknote slot, the banknote storage unit, the banknote dispenser, and the banknote validity. The constructor for this class takes a total
+ * cost as a formal parameter, in order to communicate with the checkout use case. The deduction of the total price takes place in the validBanknoteDetected()
+ * method (i.e., only deduct the cost once a banknote is validated)
+ */
 import java.util.ArrayList;
 import java.util.Currency;
 
@@ -19,13 +28,11 @@ public class PayBanknote implements BanknoteSlotObserver, BanknoteValidatorObser
 
 	@Override
 	public void enabled(AbstractDevice<? extends AbstractDeviceObserver> device) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void disabled(AbstractDevice<? extends AbstractDeviceObserver> device) {
-		// TODO Auto-generated method stub
 		
 	}
 	ArrayList<Banknote> validBanknotes = new ArrayList<Banknote>();
