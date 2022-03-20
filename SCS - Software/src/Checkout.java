@@ -15,6 +15,7 @@ public class Checkout implements ElectronicScaleObserver
 
     private PayBanknote payB = new PayBanknote();
     private coinUSE payC = new coinUSE();
+    private ScanItem scanned = new ScanItem();
 
     public void setPaymentType(int a)
     {
@@ -30,7 +31,7 @@ public class Checkout implements ElectronicScaleObserver
     {
         return sucessfulTransaction;
     }
-    
+
     public double calcPaidCB()
     {
         paid = payB.getTotalBanknotes() + (payC.coinTotal).doubleValue();
@@ -39,7 +40,13 @@ public class Checkout implements ElectronicScaleObserver
 
     public void calcTotalToBePaid()
     {
-
+        int j = scanned.barcodesScanned.size();
+        int k = 0;
+        for(int i = 0; i < j; i++);
+        {
+            scanned.barcodesScanned.get(k);
+            k++;
+        }
     }
 
     public void cancelTransaction()

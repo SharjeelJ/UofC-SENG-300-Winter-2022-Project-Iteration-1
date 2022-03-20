@@ -64,6 +64,12 @@ public class PayBanknote implements BanknoteSlotObserver, BanknoteValidatorObser
 	{
 		totalCost = cost;
 	}
+
+	public PayBanknote()
+	{
+
+	}
+	
 	/**
 	 * Sets banknoteInserted boolean to true, which should be the expected reaction if this method is called.
 	 * banknoteInserted and banknoteRemoved set to false as they cannot be true at the same time as banknoteRemoved,
