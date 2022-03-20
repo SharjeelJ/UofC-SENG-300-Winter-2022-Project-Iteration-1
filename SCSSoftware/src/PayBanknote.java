@@ -5,7 +5,8 @@
  * This implementation consists of an ArrayList that keeps track of all validated banknotes, status flags that are indicative of the state of
  * the banknote slot, the banknote storage unit, the banknote dispenser, and the banknote validity. The constructor for this class takes a total
  * cost as a formal parameter, in order to communicate with the checkout use case. The deduction of the total price takes place in the validBanknoteDetected()
- * method (i.e., only deduct the cost once a banknote is validated)
+ * method (i.e., only deduct the cost once a banknote is validated). A get-method is also provided for getting the sum of all values of the valid
+ * inserted banknotes, this can prove useful in checkout as well.
  */
 import java.util.ArrayList;
 import java.util.Currency;
@@ -53,6 +54,7 @@ public class PayBanknote implements BanknoteSlotObserver, BanknoteValidatorObser
 	private boolean billAdded;
 	private boolean billRemoved;
 	private double totalCost;
+	private int banknoteSum;
 	/**
 	 * PayBanknote is a class that takes a cost as a formal parameter and compares this total cost owed to the total cost paid. Only valid
 	 * banknotes can contribute to the total cost paid, thus the deduction of totalCost happens inside validBanknoteDetected.
@@ -239,6 +241,18 @@ public class PayBanknote implements BanknoteSlotObserver, BanknoteValidatorObser
 			Currency c = banknotes[i].getCurrency();
 			System.out.println("Banknote " + (i+1) + ":\tValue: " + value + "\tCurrency: " + c);
 		}
+	}
+	/**
+	 * Returns the sum of all the valid banknotes inserted.
+	 * iterates through ArrayList of valid banknotes and sums up all the values of the banknotes.
+	 * @return banknoteSum
+	 */
+	public int getTotalBanknotes()
+	{
+		for(int i = 0; i < validBanknotes.size(); i++) {
+			banknoteSum += validBanknotes.get(i).getValue();
+		}
+		return banknoteSum;
 	}
 
 }
