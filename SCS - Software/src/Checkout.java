@@ -1,3 +1,5 @@
+import java.math.BigDecimal;
+
 import org.lsmr.selfcheckout.devices.AbstractDevice;
 import org.lsmr.selfcheckout.devices.ElectronicScale;
 import org.lsmr.selfcheckout.devices.observers.AbstractDeviceObserver;
@@ -6,13 +8,13 @@ import org.lsmr.selfcheckout.devices.observers.ElectronicScaleObserver;
 public class Checkout implements ElectronicScaleObserver
 
 {
-    int paymentType = 0;
-    double totalToBePaid;
-    double paid = 0;
-    boolean sucessfulTransaction = false;
+    private int paymentType = 0;
+    private double totalToBePaid;
+    private double paid = 0;
+    private boolean sucessfulTransaction = false;
 
-    PayBanknote payB = new PayBanknote();
-    coinUSE payC = new coinUSE();
+    private PayBanknote payB = new PayBanknote();
+    private coinUSE payC = new coinUSE();
 
     public void setPaymentType(int a)
     {
@@ -24,10 +26,15 @@ public class Checkout implements ElectronicScaleObserver
         totalToBePaid = a;
     }    
 
+    public boolean getSuccessfulTransaction()
+    {
+        return sucessfulTransaction;
+    }
+    
     public double calcPaidCB()
     {
-        paid += payB.getTotalBanknotes();
-        //paid += payC.
+        paid = payB.getTotalBanknotes() + (payC.coinTotal).doubleValue();
+        return paid;
     }
 
     public void calcTotalToBePaid()
@@ -51,7 +58,19 @@ public class Checkout implements ElectronicScaleObserver
             }
             case 2:
             {
-                if(calcPaidCB() >= totalToBePaid)
+                calcPaidCB();
+                if(paid >= totalToBePaid)
+                {
+                    sucessfulTransaction = true;
+                    /*if(paid > totalToBePaid)
+                    {
+                        returnChange();
+                    }*/
+                }
+                else
+                {
+
+                }
                 
                 //pay with cash
                 break;
