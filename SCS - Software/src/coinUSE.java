@@ -1,5 +1,3 @@
-package org.lsmr.selfcheckout.devices.observers;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
@@ -10,6 +8,7 @@ import org.lsmr.selfcheckout.devices.CoinSlot;
 import org.lsmr.selfcheckout.devices.CoinStorageUnit;
 import org.lsmr.selfcheckout.devices.CoinTray;
 import org.lsmr.selfcheckout.devices.CoinValidator;
+import org.lsmr.selfcheckout.devices.observers.*;
 
 public class coinUSE  implements CoinDispenserObserver,CoinSlotObserver,CoinStorageUnitObserver,CoinTrayObserver,CoinValidatorObserver{
 
