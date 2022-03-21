@@ -13,8 +13,9 @@ public class BaggingArea implements ElectronicScaleObserver
     private double initialWeightInGrams;
     private double finalWeightInGrams;
 
-    private int numberOfItems;
+    private int numberOfItems = 0;
 
+    // return number of items in bagging area
     public int numberOfItemsInBaggingArea()
     {
         return numberOfItems;
@@ -32,13 +33,25 @@ public class BaggingArea implements ElectronicScaleObserver
 
     }
 
-    public void changeWeight(ElectronicScale scale, double weight)
+    public void changeWeight(ElectronicScale scale, double weightInGrams)
     {
+        // change final weight
         initialWeightInGrams = finalWeightInGrams;
-        finalWeightInGrams = weight;
+        finalWeightInGrams = weightInGrams;
+
+        // change number of items in bagging area
+        if(finalWeightInGrams > initialWeightInGrams)
+        {
+            // if final weight is greater than initial than an item was added
+            numberOfItems = numberOfItems + 1;
+        }else if(finalWeightInGrams < initialWeightInGrams) {
+            // if final weight is less than initial than an item was removed
+            numberOfItems = numberOfItems - 1;
+        }
     }
 
-    public double getWeight()
+    // return the final weight in bagging area
+    public double getWeightInGrams()
     {
         return finalWeightInGrams;
     }
