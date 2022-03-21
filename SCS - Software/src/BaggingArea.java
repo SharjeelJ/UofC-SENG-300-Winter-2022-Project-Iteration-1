@@ -33,8 +33,9 @@ public class BaggingArea implements ElectronicScaleObserver
 
     }
 
-    public void changeWeight(ElectronicScale scale, double weightInGrams)
-    {
+    @Override
+    public void weightChanged(ElectronicScale scale, double weightInGrams) {
+        // TODO Auto-generated method stub
         // change final weight
         initialWeightInGrams = finalWeightInGrams;
         finalWeightInGrams = weightInGrams;
@@ -48,6 +49,18 @@ public class BaggingArea implements ElectronicScaleObserver
             // if final weight is less than initial than an item was removed
             numberOfItems = numberOfItems - 1;
         }
+    }
+
+    @Override
+    public void overload(ElectronicScale scale) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void outOfOverload(ElectronicScale scale) {
+        // TODO Auto-generated method stub
+        
     }
 
     // return the final weight in bagging area
