@@ -35,6 +35,12 @@ public class Checkout
      *              Collection of stores inventory
      * @param e 
      *              Object to make sure the correct items are placed in the bagging area
+     * @param f
+     *              Receipt printer 
+     * @param g
+     *              Amount of ink for the printer
+     * @param h
+     *              Amount of paper for the printer
 	 */
     public Checkout(PayBanknote a, PayCoin b, ScanItem c, BarcodedItemCollection d, BaggingArea e, ReceiptPrinter f, int g, int h)
     {
