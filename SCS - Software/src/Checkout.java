@@ -11,14 +11,16 @@ public class Checkout
     private BigDecimal totalToBePaid = BigDecimal.valueOf(0);
     private BigDecimal paid = BigDecimal.valueOf(0);
     private int sucessfulTransaction = 1;
-
-    private  PayBanknote payB = new PayBanknote();
+    private int inkQuantity = 0; 
+    private int paperUnits = 0;
+    private PayBanknote payB = new PayBanknote();
     private PayCoin payC = new PayCoin();
     private ScanItem scanned = new ScanItem();
     private BarcodedItemCollection collection = new BarcodedItemCollection();
     private double expectedWeightInGrams = 0.0;
     private ReceiptPrinter printer = new ReceiptPrinter();
     private BaggingArea bagging = new BaggingArea();
+
 
     /** 
 	 * Constructor for checkout class
@@ -34,13 +36,17 @@ public class Checkout
      * @param e 
      *              Object to make sure the correct items are placed in the bagging area
 	 */
-    public Checkout(PayBanknote a, PayCoin b, ScanItem c, BarcodedItemCollection d, BaggingArea e)
+    public Checkout(PayBanknote a, PayCoin b, ScanItem c, BarcodedItemCollection d, BaggingArea e, ReceiptPrinter f, int g, int h)
     {
         payB = a;
         payC = b;
         scanned = c;
         collection = d;
         bagging = e;
+        printer = f;
+        printer.addInk(g);
+        printer.addPaper(h);
+        printer.endConfigurationPhase();
     }
 
     /** 
@@ -130,6 +136,8 @@ public class Checkout
 	 */
     public void receipt(BigDecimal paid, BigDecimal totalToBePaid)
     {
+        printer.addInk(inkQuantity);
+        printer.addPaper(paperUnits);
         String tempPaid = NumberFormat.getCurrencyInstance().format(paid);
         String tempTotal = NumberFormat.getCurrencyInstance().format(totalToBePaid);
         String toPrint = "Total: " + tempTotal + "\n" + "Paid: " + tempPaid + "\n" + "Thank you for your purchase.";
