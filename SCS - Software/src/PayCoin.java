@@ -43,7 +43,7 @@ public class PayCoin implements CoinDispenserObserver, CoinSlotObserver, CoinSto
     {
         // TODO Auto-generated method stub
         validCoin = true;
-        coinTotal.add(value);
+        coinTotal = coinTotal.add(value);
     }
 
     @Override
