@@ -25,4 +25,9 @@ public class BaggingArea implements ElectronicScaleObserver
     {
 
     }
+
+    public double getWeight()
+    {
+        return finalWeightInGrams;
+    }
 }
