@@ -69,7 +69,8 @@ public class Checkout
         {
             printer.print(toPrint.charAt(i));
         }
-
+        printer.cutPaper();
+        printer.removeReceipt();
     }
 
     public void cancelTransaction()
