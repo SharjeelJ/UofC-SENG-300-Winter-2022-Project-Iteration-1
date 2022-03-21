@@ -70,7 +70,7 @@ public class Checkout
     /** 
 	 * method to get the current value of sucessfullTransaction
 	 * 
-	 * @return what is the current value of sucessfulTransaction were 0 is true, 1 is false, and 2 is error
+	 * @return what is the current value of sucessfulTransaction were 0 is true, and 2 is error
      * 
 	 */
     public int getSuccessfulTransaction()
