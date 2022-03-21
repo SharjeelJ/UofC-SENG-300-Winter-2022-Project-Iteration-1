@@ -14,7 +14,7 @@ public class BaggingArea implements ElectronicScaleObserver
     private double finalWeightInGrams;
     private double prevWeight;
     private double itemWeight;
-    private double scaleSensitivity = 0.10;
+    private double scaleSensitivity = 0.05;
 
     private int numberOfItems = 0;
 
