@@ -16,44 +16,12 @@ public class SoftwareTest
     SelfCheckoutStation selfCheckoutStation;
 
     // Declares all the software implementations
-    BarcodedItemCollection itemLookup = new BarcodedItemCollection();
-    Checkout checkoutUseCase = new Checkout();
-    ScanItem scanItemUseCase = new ScanItem();
-    // TODO: Adjust the class to be the bagging area use case's once implemented
-    ElectronicScaleObserver baggingAreaUseCase = new ElectronicScaleObserver()
-    {
-        @Override
-        public void weightChanged(ElectronicScale scale, double weightInGrams)
-        {
-
-        }
-
-        @Override
-        public void overload(ElectronicScale scale)
-        {
-
-        }
-
-        @Override
-        public void outOfOverload(ElectronicScale scale)
-        {
-
-        }
-
-        @Override
-        public void enabled(AbstractDevice <? extends AbstractDeviceObserver> device)
-        {
-
-        }
-
-        @Override
-        public void disabled(AbstractDevice <? extends AbstractDeviceObserver> device)
-        {
-
-        }
-    };
-    PayCoin coinUseCase = new PayCoin();
-    PayBanknote banknoteUseCase = new PayBanknote(0);
+    BarcodedItemCollection itemLookup;
+    Checkout checkoutUseCase;
+    ScanItem scanItemUseCase;
+    ElectronicScaleObserver baggingAreaUseCase;
+    PayCoin coinUseCase;
+    PayBanknote banknoteUseCase;
 
     // Initialize static arrays to store the banknote and coin denominations (that will be fed to the self checkout station)
     final int[] banknoteDenominations = new int[] {5, 10, 20, 50};
@@ -69,6 +37,46 @@ public class SoftwareTest
     {
         // Initializes the self checkout station
         selfCheckoutStation = new SelfCheckoutStation(Currency.getInstance("CAD"), banknoteDenominations, coinDenominations, scaleWeightLimit, scaleSensitivity);
+
+        // Initialize all the software implementations
+        itemLookup = new BarcodedItemCollection();
+        checkoutUseCase = new Checkout();
+        scanItemUseCase = new ScanItem();
+        // TODO: Adjust the class to be the bagging area use case's once implemented
+        baggingAreaUseCase = new ElectronicScaleObserver()
+        {
+            @Override
+            public void weightChanged(ElectronicScale scale, double weightInGrams)
+            {
+
+            }
+
+            @Override
+            public void overload(ElectronicScale scale)
+            {
+
+            }
+
+            @Override
+            public void outOfOverload(ElectronicScale scale)
+            {
+
+            }
+
+            @Override
+            public void enabled(AbstractDevice <? extends AbstractDeviceObserver> device)
+            {
+
+            }
+
+            @Override
+            public void disabled(AbstractDevice <? extends AbstractDeviceObserver> device)
+            {
+
+            }
+        };
+        coinUseCase = new PayCoin();
+        banknoteUseCase = new PayBanknote(0);
     }
 
     // Tests to see if an item is successfully scanned and stored (attempts scanning up to 5 times if necessary due to there being a chance for a scan to fail)
@@ -168,5 +176,75 @@ public class SoftwareTest
         selfCheckoutStation.banknoteInput.accept(new Banknote(Currency.getInstance("CAD"), 100));
 
         Assert.assertEquals(banknoteUseCase.getTotalBanknotes(), 0);
+    }
+
+    // Tests to see if the checkout process is successful
+    @Test
+    public void testSuccessfulCheckout() throws DisabledException, OverloadException
+    {
+        selfCheckoutStation.scanner.attach(scanItemUseCase);
+        selfCheckoutStation.scale.attach(baggingAreaUseCase);
+        selfCheckoutStation.coinValidator.attach(coinUseCase);
+        selfCheckoutStation.banknoteValidator.attach(banknoteUseCase);
+
+        BarcodedItem testBarcodedItem1 = new BarcodedItem(new Barcode(new Numeral[] {Numeral.one}), scaleSensitivity);
+        BarcodedProduct testBarcodedProduct1 = new BarcodedProduct(new Barcode(new Numeral[] {Numeral.one}), "N/A", BigDecimal.valueOf(10.00));
+        BarcodedItem testBarcodedItem2 = new BarcodedItem(new Barcode(new Numeral[] {Numeral.two}), scaleSensitivity * 2);
+        BarcodedProduct testBarcodedProduct2 = new BarcodedProduct(new Barcode(new Numeral[] {Numeral.two}), "N/A", BigDecimal.valueOf(20.00));
+
+        itemLookup.addItem(testBarcodedItem1);
+        itemLookup.addProduct(testBarcodedProduct1);
+        itemLookup.addItem(testBarcodedItem2);
+        itemLookup.addProduct(testBarcodedProduct2);
+
+        selfCheckoutStation.scanner.scan(testBarcodedItem1);
+        selfCheckoutStation.scanner.scan(testBarcodedItem2);
+
+        selfCheckoutStation.scale.add(testBarcodedItem1);
+        selfCheckoutStation.scale.add(testBarcodedItem2);
+
+        selfCheckoutStation.coinSlot.accept(new Coin(Currency.getInstance("CAD"), BigDecimal.valueOf(2.00)));
+        selfCheckoutStation.coinSlot.accept(new Coin(Currency.getInstance("CAD"), BigDecimal.valueOf(1.00)));
+        selfCheckoutStation.coinSlot.accept(new Coin(Currency.getInstance("CAD"), BigDecimal.valueOf(2.00)));
+
+        selfCheckoutStation.banknoteInput.accept(new Banknote(Currency.getInstance("CAD"), 10));
+        selfCheckoutStation.banknoteInput.accept(new Banknote(Currency.getInstance("CAD"), 5));
+        selfCheckoutStation.banknoteInput.accept(new Banknote(Currency.getInstance("CAD"), 10));
+
+        Assert.assertEquals(checkoutUseCase.checkoutMain(), 0);
+    }
+
+    // Tests to see if the checkout process is unsuccessful due to insufficient funds
+    @Test
+    public void testUnsuccessfulCheckout() throws DisabledException, OverloadException
+    {
+        selfCheckoutStation.scanner.attach(scanItemUseCase);
+        selfCheckoutStation.scale.attach(baggingAreaUseCase);
+        selfCheckoutStation.coinValidator.attach(coinUseCase);
+        selfCheckoutStation.banknoteValidator.attach(banknoteUseCase);
+
+        BarcodedItem testBarcodedItem1 = new BarcodedItem(new Barcode(new Numeral[] {Numeral.one}), scaleSensitivity);
+        BarcodedProduct testBarcodedProduct1 = new BarcodedProduct(new Barcode(new Numeral[] {Numeral.one}), "N/A", BigDecimal.valueOf(10.00));
+        BarcodedItem testBarcodedItem2 = new BarcodedItem(new Barcode(new Numeral[] {Numeral.two}), scaleSensitivity * 2);
+        BarcodedProduct testBarcodedProduct2 = new BarcodedProduct(new Barcode(new Numeral[] {Numeral.two}), "N/A", BigDecimal.valueOf(20.00));
+
+        itemLookup.addItem(testBarcodedItem1);
+        itemLookup.addProduct(testBarcodedProduct1);
+        itemLookup.addItem(testBarcodedItem2);
+        itemLookup.addProduct(testBarcodedProduct2);
+
+        selfCheckoutStation.scanner.scan(testBarcodedItem1);
+        selfCheckoutStation.scanner.scan(testBarcodedItem2);
+
+        selfCheckoutStation.scale.add(testBarcodedItem1);
+        selfCheckoutStation.scale.add(testBarcodedItem2);
+
+        selfCheckoutStation.coinSlot.accept(new Coin(Currency.getInstance("CAD"), BigDecimal.valueOf(2.00)));
+        selfCheckoutStation.coinSlot.accept(new Coin(Currency.getInstance("CAD"), BigDecimal.valueOf(1.00)));
+
+        selfCheckoutStation.banknoteInput.accept(new Banknote(Currency.getInstance("CAD"), 10));
+        selfCheckoutStation.banknoteInput.accept(new Banknote(Currency.getInstance("CAD"), 5));
+
+        Assert.assertEquals(checkoutUseCase.checkoutMain(), 1);
     }
 }
