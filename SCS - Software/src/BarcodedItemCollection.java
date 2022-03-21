@@ -29,8 +29,7 @@ public class BarcodedItemCollection
         {
            if(items.get(i).getBarcode() == barcode)
            {
-                double temp =(items.get(i).getWeight() * (products.get(i).getPrice().doubleValue()));
-                price = BigDecimal.valueOf(temp);
+                price = products.get(i).getPrice().multiply(BigDecimal.valueOf(items.get(i).getWeight()));
                 break;
            }
         }
