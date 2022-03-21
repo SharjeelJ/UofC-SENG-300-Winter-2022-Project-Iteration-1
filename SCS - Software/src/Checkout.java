@@ -1,10 +1,7 @@
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 
-import org.lsmr.selfcheckout.devices.AbstractDevice;
-import org.lsmr.selfcheckout.devices.ElectronicScale;
 import org.lsmr.selfcheckout.devices.ReceiptPrinter;
-import org.lsmr.selfcheckout.devices.observers.AbstractDeviceObserver;
-
 
 public class Checkout 
 
@@ -19,6 +16,7 @@ public class Checkout
     private ScanItem scanned = new ScanItem();
     private BarcodedItemCollection collection = new BarcodedItemCollection();
     private double expectedWeightInGrams = 0.0;
+    private ReceiptPrinter printer = new ReceiptPrinter();
 
     public void setPaymentType(int a)
     {
@@ -60,6 +58,19 @@ public class Checkout
         {
             expectedWeightInGrams = collection.getExpectedWeight(scanned.barcodesScanned.get(i));
         }
+    }
+
+    public void receipt(BigDecimal paid, BigDecimal totalToBePaid)
+    {
+        String tempPaid = NumberFormat.getCurrencyInstance().format(paid);
+        String tempTotal = NumberFormat.getCurrencyInstance().format(totalToBePaid);
+        String toPrint = "Total: " + tempTotal + "\n" + "Paid: " + tempPaid + "\n" + "Thank you for your purchase.";
+        for(int i = 0; i < toPrint.length(); i++)
+        {
+            printer.print(toPrint.charAt(i));
+        }
+        printer.cutPaper();
+        printer.removeReceipt();
     }
 
     public void cancelTransaction()
