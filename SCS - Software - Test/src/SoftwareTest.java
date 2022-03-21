@@ -197,8 +197,10 @@ public class SoftwareTest
         itemLookup.addItem(testBarcodedItem2);
         itemLookup.addProduct(testBarcodedProduct2);
 
-        selfCheckoutStation.scanner.scan(testBarcodedItem1);
-        selfCheckoutStation.scanner.scan(testBarcodedItem2);
+        for (int attemptCounter = 0; attemptCounter < 10; attemptCounter++)
+            if (scanItemUseCase.barcodesScanned.size() == 0) selfCheckoutStation.scanner.scan(testBarcodedItem1);
+        for (int attemptCounter = 0; attemptCounter < 10; attemptCounter++)
+            if (scanItemUseCase.barcodesScanned.size() == 1) selfCheckoutStation.scanner.scan(testBarcodedItem2);
 
         selfCheckoutStation.scale.add(testBarcodedItem1);
         selfCheckoutStation.scale.add(testBarcodedItem2);
@@ -233,8 +235,10 @@ public class SoftwareTest
         itemLookup.addItem(testBarcodedItem2);
         itemLookup.addProduct(testBarcodedProduct2);
 
-        selfCheckoutStation.scanner.scan(testBarcodedItem1);
-        selfCheckoutStation.scanner.scan(testBarcodedItem2);
+        for (int attemptCounter = 0; attemptCounter < 10; attemptCounter++)
+            if (scanItemUseCase.barcodesScanned.size() == 0) selfCheckoutStation.scanner.scan(testBarcodedItem1);
+        for (int attemptCounter = 0; attemptCounter < 10; attemptCounter++)
+            if (scanItemUseCase.barcodesScanned.size() == 1) selfCheckoutStation.scanner.scan(testBarcodedItem2);
 
         selfCheckoutStation.scale.add(testBarcodedItem1);
         selfCheckoutStation.scale.add(testBarcodedItem2);
