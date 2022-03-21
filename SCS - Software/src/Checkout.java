@@ -108,7 +108,7 @@ public class Checkout
             }
 
         }
-        if(sucessfulTransaction == 1)
+        if(sucessfulTransaction == 0)
         {
             receipt(paid, totalToBePaid);
         }
