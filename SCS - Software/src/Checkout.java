@@ -165,34 +165,22 @@ public class Checkout
             cancelTransaction();
             return sucessfulTransaction;
         }
-        switch(paymentType)
+        
+        calcPaidBC();
+        if(paid.compareTo(totalToBePaid) >= 0)
         {
-            /*case 1:
+            sucessfulTransaction = 0;
+            /*if(paid > totalToBePaid)
             {
-                //pay with card (for later)
-                break;
+                returnChange();
             }*/
-            case 2:
-            {
-                //pay with cash
-                calcPaidBC();
-                if(paid.compareTo(totalToBePaid) >= 0)
-                {
-                    sucessfulTransaction = 0;
-                    /*if(paid > totalToBePaid)
-                    {
-                        returnChange();
-                    }*/
-                }
-                else
-                {
-                    cancelTransaction();
-                    return sucessfulTransaction;
-                }
-                break;
-            }
-
         }
+        else
+        {
+            cancelTransaction();
+            return sucessfulTransaction;
+        }
+        
         if(sucessfulTransaction == 0)
         {
             receipt(paid, totalToBePaid);
