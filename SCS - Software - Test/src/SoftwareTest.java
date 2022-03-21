@@ -13,7 +13,7 @@ import java.util.Currency;
 
 public class SoftwareTest
 {
-    // Declare the self checkout stations that will be initialized and used by the test cases
+    // Declare the self-checkout stations that will be initialized and used by the test cases
     SelfCheckoutStation selfCheckoutStation;
 
     // Declare the receipt printer hardware
@@ -27,7 +27,7 @@ public class SoftwareTest
     PayBanknote banknoteUseCase;
     Checkout checkoutUseCase;
 
-    // Initialize static arrays to store the banknote and coin denominations (that will be fed to the self checkout station)
+    // Initialize static arrays to store the banknote and coin denominations (that will be fed to the self-checkout station)
     final int[] banknoteDenominations = new int[] {5, 10, 20, 50};
     final BigDecimal[] coinDenominations = new BigDecimal[] {BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.10), BigDecimal.valueOf(0.25), BigDecimal.valueOf(1.00), BigDecimal.valueOf(2.00)};
 
@@ -39,7 +39,7 @@ public class SoftwareTest
     @Before
     public void setup()
     {
-        // Initializes the self checkout station
+        // Initializes the self-checkout station
         selfCheckoutStation = new SelfCheckoutStation(Currency.getInstance("CAD"), banknoteDenominations, coinDenominations, scaleWeightLimit, scaleSensitivity);
 
         // Initialize the receipt printer hardware
@@ -50,7 +50,7 @@ public class SoftwareTest
         scanItemUseCase = new ScanItem();
         baggingAreaUseCase = new BaggingArea();
         coinUseCase = new PayCoin();
-        banknoteUseCase = new PayBanknote(0);
+        banknoteUseCase = new PayBanknote();
         checkoutUseCase = new Checkout(banknoteUseCase, coinUseCase, scanItemUseCase, itemLookup, baggingAreaUseCase, receiptPrinter, 1000, 1000);
     }
 
@@ -215,6 +215,43 @@ public class SoftwareTest
 
         selfCheckoutStation.scale.add(testBarcodedItem1);
         selfCheckoutStation.scale.add(testBarcodedItem2);
+
+        selfCheckoutStation.coinSlot.accept(new Coin(Currency.getInstance("CAD"), BigDecimal.valueOf(2.00)));
+        selfCheckoutStation.coinSlot.accept(new Coin(Currency.getInstance("CAD"), BigDecimal.valueOf(1.00)));
+
+        selfCheckoutStation.banknoteInput.accept(new Banknote(Currency.getInstance("CAD"), 10));
+        selfCheckoutStation.banknoteInput.accept(new Banknote(Currency.getInstance("CAD"), 5));
+
+        Assert.assertEquals(checkoutUseCase.checkoutMain(), 2);
+    }
+
+    // Tests to see if the checkout process is unsuccessful due to a weight mismatch
+    @Test
+    public void testUnsuccessfulCheckout2() throws DisabledException, OverloadException
+    {
+        selfCheckoutStation.scanner.attach(scanItemUseCase);
+        selfCheckoutStation.scale.attach(baggingAreaUseCase);
+        selfCheckoutStation.coinValidator.attach(coinUseCase);
+        selfCheckoutStation.banknoteValidator.attach(banknoteUseCase);
+
+        BarcodedItem testBarcodedItem1 = new BarcodedItem(new Barcode(new Numeral[] {Numeral.one}), scaleSensitivity * 2);
+        BarcodedProduct testBarcodedProduct1 = new BarcodedProduct(new Barcode(new Numeral[] {Numeral.one}), "N/A", BigDecimal.valueOf(10.00));
+        BarcodedItem testBarcodedItem2 = new BarcodedItem(new Barcode(new Numeral[] {Numeral.two}), scaleSensitivity * 3);
+        BarcodedProduct testBarcodedProduct2 = new BarcodedProduct(new Barcode(new Numeral[] {Numeral.two}), "N/A", BigDecimal.valueOf(20.00));
+
+        itemLookup.addItem(testBarcodedItem1);
+        itemLookup.addProduct(testBarcodedProduct1);
+        itemLookup.addItem(testBarcodedItem2);
+        itemLookup.addProduct(testBarcodedProduct2);
+
+        for (int attemptCounter = 0; attemptCounter < 10; attemptCounter++)
+            if (scanItemUseCase.barcodesScanned.size() == 0) selfCheckoutStation.scanner.scan(testBarcodedItem1);
+        for (int attemptCounter = 0; attemptCounter < 10; attemptCounter++)
+            if (scanItemUseCase.barcodesScanned.size() == 1) selfCheckoutStation.scanner.scan(testBarcodedItem2);
+
+        selfCheckoutStation.scale.add(testBarcodedItem1);
+        selfCheckoutStation.scale.add(testBarcodedItem2);
+        selfCheckoutStation.scale.remove(testBarcodedItem2);
 
         selfCheckoutStation.coinSlot.accept(new Coin(Currency.getInstance("CAD"), BigDecimal.valueOf(2.00)));
         selfCheckoutStation.coinSlot.accept(new Coin(Currency.getInstance("CAD"), BigDecimal.valueOf(1.00)));
