@@ -7,8 +7,8 @@ public class Checkout
 
 {
     private int paymentType = 0;
-    private BigDecimal totalToBePaid;
-    private BigDecimal paid;
+    private BigDecimal totalToBePaid = BigDecimal.valueOf(0);
+    private BigDecimal paid = BigDecimal.valueOf(0);
     private int sucessfulTransaction = 1;
 
     private  PayBanknote payB = new PayBanknote();
@@ -91,7 +91,10 @@ public class Checkout
     public int checkoutMain()
     {
         calcTotalToBePaid();
+        if((bagging.getWeightInGrams()-expectedWeightInGrams).abs > bagging.getWeightInGrams())
+        {
 
+        }
         switch(paymentType)
         {
             /*case 1:
