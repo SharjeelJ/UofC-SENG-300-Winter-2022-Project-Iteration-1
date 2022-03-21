@@ -115,7 +115,7 @@ public class Checkout
         int i;
         for(i = 0; i < j; i++)
         {
-            expectedWeightInGrams = collection.getExpectedWeight(scanned.barcodesScanned.get(i));
+            expectedWeightInGrams += collection.getExpectedWeight(scanned.barcodesScanned.get(i));
         }
     }
 
@@ -159,7 +159,7 @@ public class Checkout
     public int checkoutMain()
     {
         calcTotalToBePaid();
-                    expectedWeight();
+        expectedWeight();
         if(Math.abs(bagging.getWeightInGrams()-expectedWeightInGrams) > bagging.getScaleSensitivity())
         {
             cancelTransaction();
