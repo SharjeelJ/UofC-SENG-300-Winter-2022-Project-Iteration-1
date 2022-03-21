@@ -17,11 +17,11 @@ public class SoftwareTest
 
     // Declares all the software implementations
     BarcodedItemCollection itemLookup;
-    Checkout checkoutUseCase;
     ScanItem scanItemUseCase;
     ElectronicScaleObserver baggingAreaUseCase;
     PayCoin coinUseCase;
     PayBanknote banknoteUseCase;
+    Checkout checkoutUseCase;
 
     // Initialize static arrays to store the banknote and coin denominations (that will be fed to the self checkout station)
     final int[] banknoteDenominations = new int[] {5, 10, 20, 50};
@@ -40,7 +40,6 @@ public class SoftwareTest
 
         // Initialize all the software implementations
         itemLookup = new BarcodedItemCollection();
-        checkoutUseCase = new Checkout();
         scanItemUseCase = new ScanItem();
         // TODO: Adjust the class to be the bagging area use case's once implemented
         baggingAreaUseCase = new ElectronicScaleObserver()
@@ -77,6 +76,7 @@ public class SoftwareTest
         };
         coinUseCase = new PayCoin();
         banknoteUseCase = new PayBanknote(0);
+        checkoutUseCase = new Checkout(banknoteUseCase, coinUseCase, scanItemUseCase, itemLookup);
     }
 
     // Tests to see if an item is successfully scanned and stored (attempts scanning up to 5 times if necessary due to there being a chance for a scan to fail)
