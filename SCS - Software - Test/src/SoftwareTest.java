@@ -1,12 +1,8 @@
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.lsmr.selfcheckout.Barcode;
-import org.lsmr.selfcheckout.BarcodedItem;
-import org.lsmr.selfcheckout.Numeral;
-import org.lsmr.selfcheckout.devices.AbstractDevice;
-import org.lsmr.selfcheckout.devices.ElectronicScale;
-import org.lsmr.selfcheckout.devices.SelfCheckoutStation;
+import org.lsmr.selfcheckout.*;
+import org.lsmr.selfcheckout.devices.*;
 import org.lsmr.selfcheckout.devices.observers.AbstractDeviceObserver;
 import org.lsmr.selfcheckout.devices.observers.ElectronicScaleObserver;
 import org.lsmr.selfcheckout.products.BarcodedProduct;
@@ -81,8 +77,10 @@ public class SoftwareTest
     {
         selfCheckoutStation.scanner.attach(scanItemUseCase);
         BarcodedItem testBarcodedItem = new BarcodedItem(new Barcode(new Numeral[] {Numeral.one}), 150);
+
         for (int attemptCounter = 0; attemptCounter < 5; attemptCounter++)
             if (scanItemUseCase.barcodesScanned.isEmpty()) selfCheckoutStation.scanner.scan(testBarcodedItem);
+
         Assert.assertTrue(scanItemUseCase.barcodesScanned.contains(testBarcodedItem.getBarcode()));
     }
 
@@ -92,7 +90,9 @@ public class SoftwareTest
     {
         selfCheckoutStation.scale.attach(baggingAreaUseCase);
         BarcodedItem testBarcodedItem = new BarcodedItem(new Barcode(new Numeral[] {Numeral.one}), scaleSensitivity);
+
         selfCheckoutStation.scale.add(testBarcodedItem);
+
         // TODO: Check if the weight reported by the bagging area is equal to that of the item just added
         //        Assert.assertEquals(baggingAreaUseCase.totalWeight(), testItem.getWeight());
     }
@@ -103,7 +103,9 @@ public class SoftwareTest
     {
         selfCheckoutStation.scale.attach(baggingAreaUseCase);
         BarcodedItem testBarcodedItem = new BarcodedItem(new Barcode(new Numeral[] {Numeral.one}), scaleSensitivity);
+
         selfCheckoutStation.scale.add(testBarcodedItem);
+
         // TODO: Check if the weight reported by the bagging area is equal to 0 (item was not added)
         //        Assert.assertNotEquals(baggingAreaUseCase.totalWeight(), 0);
     }
@@ -112,11 +114,59 @@ public class SoftwareTest
     @Test
     public void testAddingItemToCollectionSuccessfully()
     {
-        BarcodedItem testBarcodedItem = new BarcodedItem(new Barcode(new Numeral[] {Numeral.one}), scaleSensitivity);
-        BarcodedProduct testBarcodedProduct = new BarcodedProduct(new Barcode(new Numeral[] {Numeral.one}), "N/A", BigDecimal.valueOf(10.00));
-        itemLookup.addItem(testBarcodedItem);
-        itemLookup.addProduct(testBarcodedProduct);
-        Assert.assertEquals(itemLookup.getExpectedWeight(testBarcodedItem.getBarcode()), testBarcodedItem.getWeight(), 0);
-        Assert.assertEquals(itemLookup.getPrice(testBarcodedItem.getBarcode()), testBarcodedProduct.getPrice().multiply(BigDecimal.valueOf(testBarcodedItem.getWeight())));
+        BarcodedItem testBarcodedItem1 = new BarcodedItem(new Barcode(new Numeral[] {Numeral.one}), scaleSensitivity);
+        BarcodedProduct testBarcodedProduct1 = new BarcodedProduct(new Barcode(new Numeral[] {Numeral.one}), "N/A", BigDecimal.valueOf(10.00));
+        BarcodedItem testBarcodedItem2 = new BarcodedItem(new Barcode(new Numeral[] {Numeral.two}), scaleSensitivity * 2);
+        BarcodedProduct testBarcodedProduct2 = new BarcodedProduct(new Barcode(new Numeral[] {Numeral.two}), "N/A", BigDecimal.valueOf(20.00));
+
+        itemLookup.addItem(testBarcodedItem1);
+        itemLookup.addProduct(testBarcodedProduct1);
+        itemLookup.addItem(testBarcodedItem2);
+        itemLookup.addProduct(testBarcodedProduct2);
+
+        Assert.assertEquals(itemLookup.getExpectedWeight(testBarcodedItem1.getBarcode()), testBarcodedItem1.getWeight(), 0);
+        Assert.assertEquals(itemLookup.getPrice(testBarcodedItem1.getBarcode()), testBarcodedProduct1.getPrice().multiply(BigDecimal.valueOf(testBarcodedItem1.getWeight())));
+        Assert.assertEquals(itemLookup.getExpectedWeight(testBarcodedItem2.getBarcode()), testBarcodedItem2.getWeight(), 0);
+        Assert.assertEquals(itemLookup.getPrice(testBarcodedItem2.getBarcode()), testBarcodedProduct2.getPrice().multiply(BigDecimal.valueOf(testBarcodedItem2.getWeight())));
+    }
+
+    // Tests to see if a coin is successfully added and stored
+    @Test
+    public void testInsertedACoinSuccessfully() throws DisabledException
+    {
+        selfCheckoutStation.coinValidator.attach(coinUseCase);
+        selfCheckoutStation.coinSlot.accept(new Coin(Currency.getInstance("CAD"), BigDecimal.valueOf(2.00)));
+
+        Assert.assertEquals(coinUseCase.coinTotal, BigDecimal.valueOf(2.00));
+    }
+
+    // Tests to see if a coin is unsuccessfully added (provided an invalid denomination)
+    @Test
+    public void testInsertedACoinUnsuccessfully() throws DisabledException
+    {
+        selfCheckoutStation.coinValidator.attach(coinUseCase);
+        selfCheckoutStation.coinSlot.accept(new Coin(Currency.getInstance("CAD"), BigDecimal.valueOf(10.00)));
+
+        Assert.assertEquals(coinUseCase.coinTotal, BigDecimal.valueOf(0));
+    }
+
+    // Tests to see if a banknote is successfully added and stored
+    @Test
+    public void testInsertedABanknoteSuccessfully() throws DisabledException, OverloadException
+    {
+        selfCheckoutStation.banknoteValidator.attach(banknoteUseCase);
+        selfCheckoutStation.banknoteInput.accept(new Banknote(Currency.getInstance("CAD"), 50));
+
+        Assert.assertEquals(banknoteUseCase.getTotalBanknotes(), 50);
+    }
+
+    // Tests to see if a banknote is unsuccessfully added (provided an invalid denomination)
+    @Test
+    public void testInsertedABanknoteUnsuccessfully() throws DisabledException, OverloadException
+    {
+        selfCheckoutStation.banknoteValidator.attach(banknoteUseCase);
+        selfCheckoutStation.banknoteInput.accept(new Banknote(Currency.getInstance("CAD"), 100));
+
+        Assert.assertEquals(banknoteUseCase.getTotalBanknotes(), 0);
     }
 }
