@@ -1,5 +1,6 @@
 import java.math.BigDecimal;
 import java.text.NumberFormat;
+import java.lang.Math;
 
 import org.lsmr.selfcheckout.devices.ReceiptPrinter;
 
@@ -91,7 +92,8 @@ public class Checkout
     public int checkoutMain()
     {
         calcTotalToBePaid();
-        if((bagging.getWeightInGrams()-expectedWeightInGrams).abs > bagging.getWeightInGrams())
+        int i = abs();
+        if(abs(bagging.getWeightInGrams()-expectedWeightInGrams).abs > bagging.())
         {
 
         }

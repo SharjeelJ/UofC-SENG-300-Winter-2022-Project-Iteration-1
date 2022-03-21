@@ -29,7 +29,7 @@ public class BarcodedItemCollection
         {
            if(items.get(i).getBarcode() == barcode)
            {
-                price = products.get(i).getPrice().multiply(BigDecimal.valueOf(items.get(i).getWeight()));
+                price = products.get(i).getPrice();
                 break;
            }
         }
