@@ -37,4 +37,18 @@ public class BarcodedItemCollection
 
         return price;
     }
+
+    public double getExpectedWeight(Barcode barcode)
+    {
+        double weight = 0.0;
+        for(int i = 0; i < items.size(); i++)
+        {
+           if(items.get(i).getBarcode() == barcode)
+           {
+                weight = items.get(i).getWeight();
+                break;
+           }
+        }
+        return weight;
+    }
 }

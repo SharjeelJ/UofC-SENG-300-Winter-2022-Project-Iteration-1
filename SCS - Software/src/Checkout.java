@@ -10,20 +10,22 @@ public class Checkout implements ElectronicScaleObserver
 
 {
     private int paymentType = 0;
-    private double totalToBePaid;
-    private double paid = 0;
+    private BigDecimal totalToBePaid;
+    private BigDecimal paid;
     private boolean sucessfulTransaction = false;
 
     private PayBanknote payB = new PayBanknote();
     private PayCoin payC = new PayCoin();
     private ScanItem scanned = new ScanItem();
+    private BarcodedItemCollection collection = new BarcodedItemCollection();
+    private double expectedWeightInGrams = 0.0;
 
     public void setPaymentType(int a)
     {
         paymentType = a;
     }
 
-    public void setTotalToBePaid(int a)
+    public void setTotalToBePaid(BigDecimal a)
     {
         totalToBePaid = a;
     }    
@@ -33,20 +35,30 @@ public class Checkout implements ElectronicScaleObserver
         return sucessfulTransaction;
     }
 
-    public double calcPaidCB()
+    public BigDecimal calcPaidBC()
     {
-        paid = payB.getTotalBanknotes() + (payC.coinTotal).doubleValue();
+        paid = BigDecimal.valueOf(payB.getTotalBanknotes()).add(payC.coinTotal);
         return paid;
     }
 
     public void calcTotalToBePaid()
     {
         int j = scanned.barcodesScanned.size();
-        int k = 0;
-        for(int i = 0; i < j; i++);
+        int i;
+        for(i = 0; i < j; i++);
         {
-            scanned.barcodesScanned.get(k);
-            k++;
+            BigDecimal temp = collection.getPrice(scanned.barcodesScanned.get(i));
+            totalToBePaid = totalToBePaid.add(temp);
+        }
+    }
+
+    public void expectedWeight()
+    {
+        int j = scanned.barcodesScanned.size();
+        int i;
+        for(i = 0; i < j; i++);
+        {
+            expectedWeightInGrams = collection.getExpectedWeight(scanned.barcodesScanned.get(i));
         }
     }
 
@@ -57,6 +69,7 @@ public class Checkout implements ElectronicScaleObserver
     
     public void checkoutMain()
     {
+        calcTotalToBePaid();
         switch(paymentType)
         {
             case 1:
@@ -66,8 +79,8 @@ public class Checkout implements ElectronicScaleObserver
             }
             case 2:
             {
-                calcPaidCB();
-                if(paid >= totalToBePaid)
+                calcPaidBC();
+                if(paid.compareTo(totalToBePaid) >= 0)
                 {
                     sucessfulTransaction = true;
                     /*if(paid > totalToBePaid)
@@ -77,7 +90,7 @@ public class Checkout implements ElectronicScaleObserver
                 }
                 else
                 {
-
+                    cancelTransaction();
                 }
                 
                 //pay with cash
