@@ -92,10 +92,10 @@ public class Checkout
     public int checkoutMain()
     {
         calcTotalToBePaid();
-        int i = abs();
-        if(abs(bagging.getWeightInGrams()-expectedWeightInGrams).abs > bagging.())
+        if(Math.abs(bagging.getWeightInGrams()-expectedWeightInGrams) > bagging.getScaleSensitivity())
         {
-
+            cancelTransaction();
+            return sucessfulTransaction;
         }
         switch(paymentType)
         {
@@ -119,6 +119,7 @@ public class Checkout
                 else
                 {
                     cancelTransaction();
+                    return sucessfulTransaction;
                 }
                 break;
             }
