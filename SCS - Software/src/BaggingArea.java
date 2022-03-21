@@ -83,6 +83,7 @@ public class BaggingArea implements ElectronicScaleObserver
     //returns scale sensitivity factor
     public double getScaleSensitivity()
     {
+        scaleSensitivity = scale.getSensitivity();
         return scaleSensitivity;
         }
 }
