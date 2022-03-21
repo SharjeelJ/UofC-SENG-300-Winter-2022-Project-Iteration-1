@@ -9,7 +9,7 @@ public class Checkout
     private int paymentType = 0;
     private BigDecimal totalToBePaid;
     private BigDecimal paid;
-    private boolean sucessfulTransaction = false;
+    private int sucessfulTransaction = 1;
 
     private PayBanknote payB = new PayBanknote();
     private PayCoin payC = new PayCoin();
@@ -28,7 +28,7 @@ public class Checkout
         totalToBePaid = a;
     }    
 
-    public boolean getSuccessfulTransaction()
+    public int getSuccessfulTransaction()
     {
         return sucessfulTransaction;
     }
@@ -75,10 +75,10 @@ public class Checkout
 
     public void cancelTransaction()
     {
-        
+        sucessfulTransaction = 2;
     }
     
-    public void checkoutMain()
+    public int checkoutMain()
     {
         calcTotalToBePaid();
         switch(paymentType)
@@ -90,10 +90,11 @@ public class Checkout
             }*/
             case 2:
             {
+                //pay with cash
                 calcPaidBC();
                 if(paid.compareTo(totalToBePaid) >= 0)
                 {
-                    sucessfulTransaction = true;
+                    sucessfulTransaction = 0;
                     /*if(paid > totalToBePaid)
                     {
                         returnChange();
@@ -103,15 +104,14 @@ public class Checkout
                 {
                     cancelTransaction();
                 }
-                
-                //pay with cash
                 break;
             }
 
         }
-        if(sucessfulTransaction)
+        if(sucessfulTransaction == 1)
         {
-            //ReceiptPrinter
+            receipt(paid, totalToBePaid);
         }
+        return sucessfulTransaction;
     }
 }
