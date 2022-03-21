@@ -7,7 +7,7 @@ import org.lsmr.selfcheckout.devices.ReceiptPrinter;
 public class Checkout 
 
 {
-    private int paymentType = 0;
+    private int paymentType = 2;
     private BigDecimal totalToBePaid = BigDecimal.valueOf(0);
     private BigDecimal paid = BigDecimal.valueOf(0);
     private int sucessfulTransaction = 1;
