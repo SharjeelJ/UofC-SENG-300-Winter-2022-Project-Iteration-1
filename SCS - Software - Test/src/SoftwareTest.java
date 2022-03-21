@@ -2,9 +2,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.lsmr.selfcheckout.*;
-import org.lsmr.selfcheckout.devices.*;
-import org.lsmr.selfcheckout.devices.observers.AbstractDeviceObserver;
-import org.lsmr.selfcheckout.devices.observers.ElectronicScaleObserver;
+import org.lsmr.selfcheckout.devices.DisabledException;
+import org.lsmr.selfcheckout.devices.OverloadException;
+import org.lsmr.selfcheckout.devices.ReceiptPrinter;
+import org.lsmr.selfcheckout.devices.SelfCheckoutStation;
 import org.lsmr.selfcheckout.products.BarcodedProduct;
 
 import java.math.BigDecimal;
@@ -15,10 +16,13 @@ public class SoftwareTest
     // Declare the self checkout stations that will be initialized and used by the test cases
     SelfCheckoutStation selfCheckoutStation;
 
+    // Declare the receipt printer hardware
+    ReceiptPrinter receiptPrinter;
+
     // Declares all the software implementations
     BarcodedItemCollection itemLookup;
     ScanItem scanItemUseCase;
-    ElectronicScaleObserver baggingAreaUseCase;
+    BaggingArea baggingAreaUseCase;
     PayCoin coinUseCase;
     PayBanknote banknoteUseCase;
     Checkout checkoutUseCase;
@@ -38,45 +42,16 @@ public class SoftwareTest
         // Initializes the self checkout station
         selfCheckoutStation = new SelfCheckoutStation(Currency.getInstance("CAD"), banknoteDenominations, coinDenominations, scaleWeightLimit, scaleSensitivity);
 
+        // Initialize the receipt printer hardware
+        receiptPrinter = new ReceiptPrinter();
+
         // Initialize all the software implementations
         itemLookup = new BarcodedItemCollection();
         scanItemUseCase = new ScanItem();
-        // TODO: Adjust the class to be the bagging area use case's once implemented
-        baggingAreaUseCase = new ElectronicScaleObserver()
-        {
-            @Override
-            public void weightChanged(ElectronicScale scale, double weightInGrams)
-            {
-
-            }
-
-            @Override
-            public void overload(ElectronicScale scale)
-            {
-
-            }
-
-            @Override
-            public void outOfOverload(ElectronicScale scale)
-            {
-
-            }
-
-            @Override
-            public void enabled(AbstractDevice <? extends AbstractDeviceObserver> device)
-            {
-
-            }
-
-            @Override
-            public void disabled(AbstractDevice <? extends AbstractDeviceObserver> device)
-            {
-
-            }
-        };
+        baggingAreaUseCase = new BaggingArea();
         coinUseCase = new PayCoin();
         banknoteUseCase = new PayBanknote(0);
-        checkoutUseCase = new Checkout(banknoteUseCase, coinUseCase, scanItemUseCase, itemLookup);
+        checkoutUseCase = new Checkout(banknoteUseCase, coinUseCase, scanItemUseCase, itemLookup, baggingAreaUseCase, receiptPrinter, 1000, 1000);
     }
 
     // Tests to see if an item is successfully scanned and stored (attempts scanning up to 5 times if necessary due to there being a chance for a scan to fail)
@@ -97,12 +72,11 @@ public class SoftwareTest
     public void testAddingItemToBaggingSuccessfully()
     {
         selfCheckoutStation.scale.attach(baggingAreaUseCase);
-        BarcodedItem testBarcodedItem = new BarcodedItem(new Barcode(new Numeral[] {Numeral.one}), scaleSensitivity);
+        BarcodedItem testBarcodedItem = new BarcodedItem(new Barcode(new Numeral[] {Numeral.one}), scaleSensitivity * 2);
 
         selfCheckoutStation.scale.add(testBarcodedItem);
 
-        // TODO: Check if the weight reported by the bagging area is equal to that of the item just added
-        //        Assert.assertEquals(baggingAreaUseCase.totalWeight(), testItem.getWeight());
+        Assert.assertEquals(baggingAreaUseCase.getWeightInGrams(), testBarcodedItem.getWeight(), 0);
     }
 
     // Tests to see if an item is not successfully added to the bagging area due to being overweight
@@ -110,12 +84,11 @@ public class SoftwareTest
     public void testAddingItemToBaggingUnsuccessfully()
     {
         selfCheckoutStation.scale.attach(baggingAreaUseCase);
-        BarcodedItem testBarcodedItem = new BarcodedItem(new Barcode(new Numeral[] {Numeral.one}), scaleSensitivity);
+        BarcodedItem testBarcodedItem = new BarcodedItem(new Barcode(new Numeral[] {Numeral.one}), scaleWeightLimit + scaleSensitivity);
 
         selfCheckoutStation.scale.add(testBarcodedItem);
 
-        // TODO: Check if the weight reported by the bagging area is equal to 0 (item was not added)
-        //        Assert.assertNotEquals(baggingAreaUseCase.totalWeight(), 0);
+        Assert.assertEquals(baggingAreaUseCase.getWeightInGrams(), 0, 0);
     }
 
     // Tests to see if an item is successfully added to the collections class (used for item information lookup)
@@ -133,9 +106,9 @@ public class SoftwareTest
         itemLookup.addProduct(testBarcodedProduct2);
 
         Assert.assertEquals(itemLookup.getExpectedWeight(testBarcodedItem1.getBarcode()), testBarcodedItem1.getWeight(), 0);
-        Assert.assertEquals(itemLookup.getPrice(testBarcodedItem1.getBarcode()), testBarcodedProduct1.getPrice().multiply(BigDecimal.valueOf(testBarcodedItem1.getWeight())));
+        Assert.assertEquals(itemLookup.getPrice(testBarcodedItem1.getBarcode()), testBarcodedProduct1.getPrice());
         Assert.assertEquals(itemLookup.getExpectedWeight(testBarcodedItem2.getBarcode()), testBarcodedItem2.getWeight(), 0);
-        Assert.assertEquals(itemLookup.getPrice(testBarcodedItem2.getBarcode()), testBarcodedProduct2.getPrice().multiply(BigDecimal.valueOf(testBarcodedItem2.getWeight())));
+        Assert.assertEquals(itemLookup.getPrice(testBarcodedItem2.getBarcode()), testBarcodedProduct2.getPrice());
     }
 
     // Tests to see if a coin is successfully added and stored
@@ -187,9 +160,9 @@ public class SoftwareTest
         selfCheckoutStation.coinValidator.attach(coinUseCase);
         selfCheckoutStation.banknoteValidator.attach(banknoteUseCase);
 
-        BarcodedItem testBarcodedItem1 = new BarcodedItem(new Barcode(new Numeral[] {Numeral.one}), scaleSensitivity);
+        BarcodedItem testBarcodedItem1 = new BarcodedItem(new Barcode(new Numeral[] {Numeral.one}), scaleSensitivity * 2);
         BarcodedProduct testBarcodedProduct1 = new BarcodedProduct(new Barcode(new Numeral[] {Numeral.one}), "N/A", BigDecimal.valueOf(10.00));
-        BarcodedItem testBarcodedItem2 = new BarcodedItem(new Barcode(new Numeral[] {Numeral.two}), scaleSensitivity * 2);
+        BarcodedItem testBarcodedItem2 = new BarcodedItem(new Barcode(new Numeral[] {Numeral.two}), scaleSensitivity * 3);
         BarcodedProduct testBarcodedProduct2 = new BarcodedProduct(new Barcode(new Numeral[] {Numeral.two}), "N/A", BigDecimal.valueOf(20.00));
 
         itemLookup.addItem(testBarcodedItem1);
@@ -225,9 +198,9 @@ public class SoftwareTest
         selfCheckoutStation.coinValidator.attach(coinUseCase);
         selfCheckoutStation.banknoteValidator.attach(banknoteUseCase);
 
-        BarcodedItem testBarcodedItem1 = new BarcodedItem(new Barcode(new Numeral[] {Numeral.one}), scaleSensitivity);
+        BarcodedItem testBarcodedItem1 = new BarcodedItem(new Barcode(new Numeral[] {Numeral.one}), scaleSensitivity * 2);
         BarcodedProduct testBarcodedProduct1 = new BarcodedProduct(new Barcode(new Numeral[] {Numeral.one}), "N/A", BigDecimal.valueOf(10.00));
-        BarcodedItem testBarcodedItem2 = new BarcodedItem(new Barcode(new Numeral[] {Numeral.two}), scaleSensitivity * 2);
+        BarcodedItem testBarcodedItem2 = new BarcodedItem(new Barcode(new Numeral[] {Numeral.two}), scaleSensitivity * 3);
         BarcodedProduct testBarcodedProduct2 = new BarcodedProduct(new Barcode(new Numeral[] {Numeral.two}), "N/A", BigDecimal.valueOf(20.00));
 
         itemLookup.addItem(testBarcodedItem1);
@@ -249,6 +222,6 @@ public class SoftwareTest
         selfCheckoutStation.banknoteInput.accept(new Banknote(Currency.getInstance("CAD"), 10));
         selfCheckoutStation.banknoteInput.accept(new Banknote(Currency.getInstance("CAD"), 5));
 
-        Assert.assertEquals(checkoutUseCase.checkoutMain(), 1);
+        Assert.assertEquals(checkoutUseCase.checkoutMain(), 2);
     }
 }
