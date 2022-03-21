@@ -79,11 +79,15 @@ public class BaggingArea implements ElectronicScaleObserver
         itemWeight = finalWeightInGrams - prevWeight;
         return itemWeight;
     }
-    
+
     //returns scale sensitivity factor
-    public double getScaleSensitivity()
+    public void setScaleSensitivity(ElectronicScale scale)
     {
         scaleSensitivity = scale.getSensitivity();
+    }
+
+    public double getScaleSensitivity()
+    {
         return scaleSensitivity;
-        }
+    }
 }
