@@ -12,6 +12,9 @@ public class BaggingArea implements ElectronicScaleObserver
 
     private double initialWeightInGrams;
     private double finalWeightInGrams;
+    private double prevWeight;
+    private double itemWeight;
+    private double scaleSensitivity = 0.10;
 
     private int numberOfItems = 0;
 
@@ -37,6 +40,7 @@ public class BaggingArea implements ElectronicScaleObserver
     public void weightChanged(ElectronicScale scale, double weightInGrams) {
         // TODO Auto-generated method stub
         // change final weight
+        prevWeight = initialWeightInGrams;
         initialWeightInGrams = finalWeightInGrams;
         finalWeightInGrams = weightInGrams;
 
@@ -68,4 +72,17 @@ public class BaggingArea implements ElectronicScaleObserver
     {
         return finalWeightInGrams;
     }
+    
+    //return current item's weight
+    public double getItemWeight()
+    {
+        itemWeight = finalWeightInGrams - prevWeight;
+        return itemWeight;
+    }
+    
+    //returns scale sensitivity factor
+    public double getScaleSensitivity()
+    {
+        return scaleSensitivity;
+        }
 }
