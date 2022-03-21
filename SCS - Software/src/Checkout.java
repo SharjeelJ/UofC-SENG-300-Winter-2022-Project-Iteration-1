@@ -11,19 +11,21 @@ public class Checkout
     private BigDecimal paid;
     private int sucessfulTransaction = 1;
 
-    public  PayBanknote payB = new PayBanknote();
+    private  PayBanknote payB = new PayBanknote();
     private PayCoin payC = new PayCoin();
     private ScanItem scanned = new ScanItem();
     private BarcodedItemCollection collection = new BarcodedItemCollection();
     private double expectedWeightInGrams = 0.0;
     private ReceiptPrinter printer = new ReceiptPrinter();
+    private BaggingArea bagging = new BaggingArea();
 
-    public Checkout(PayBanknote a, PayCoin b, ScanItem c, BarcodedItemCollection d)
+    public Checkout(PayBanknote a, PayCoin b, ScanItem c, BarcodedItemCollection d, BaggingArea e)
     {
         payB = a;
         payC = b;
         scanned = c;
         collection = d;
+        bagging = e;
     }
 
     public void setPaymentType(int a)
@@ -51,7 +53,7 @@ public class Checkout
     {
         int j = scanned.barcodesScanned.size();
         int i;
-        for(i = 0; i < j; i++);
+        for(i = 0; i < j; i++)
         {
             BigDecimal temp = collection.getPrice(scanned.barcodesScanned.get(i));
             totalToBePaid = totalToBePaid.add(temp);
@@ -89,6 +91,7 @@ public class Checkout
     public int checkoutMain()
     {
         calcTotalToBePaid();
+
         switch(paymentType)
         {
             /*case 1:
