@@ -159,6 +159,7 @@ public class Checkout
     public int checkoutMain()
     {
         calcTotalToBePaid();
+                    expectedWeight();
         if(Math.abs(bagging.getWeightInGrams()-expectedWeightInGrams) > bagging.getScaleSensitivity())
         {
             cancelTransaction();
