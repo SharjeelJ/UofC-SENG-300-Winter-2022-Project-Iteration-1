@@ -11,12 +11,20 @@ public class Checkout
     private BigDecimal paid;
     private int sucessfulTransaction = 1;
 
-    private PayBanknote payB = new PayBanknote();
+    public  PayBanknote payB = new PayBanknote();
     private PayCoin payC = new PayCoin();
     private ScanItem scanned = new ScanItem();
     private BarcodedItemCollection collection = new BarcodedItemCollection();
     private double expectedWeightInGrams = 0.0;
     private ReceiptPrinter printer = new ReceiptPrinter();
+
+    public Checkout(PayBanknote a, PayCoin b, ScanItem c, BarcodedItemCollection d)
+    {
+        payB = a;
+        payC = b;
+        scanned = c;
+        collection = d;
+    }
 
     public void setPaymentType(int a)
     {
