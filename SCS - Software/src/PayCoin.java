@@ -4,7 +4,7 @@ import org.lsmr.selfcheckout.devices.observers.*;
 
 import java.math.BigDecimal;
 
-public class coinUSE implements CoinDispenserObserver, CoinSlotObserver, CoinStorageUnitObserver, CoinTrayObserver, CoinValidatorObserver
+public class PayCoin implements CoinDispenserObserver, CoinSlotObserver, CoinStorageUnitObserver, CoinTrayObserver, CoinValidatorObserver
 {
 
     public BigDecimal coinTotal = BigDecimal.valueOf(0);

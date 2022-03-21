@@ -15,7 +15,7 @@ public class Checkout implements ElectronicScaleObserver
     private boolean sucessfulTransaction = false;
 
     private PayBanknote payB = new PayBanknote();
-    private coinUSE payC = new coinUSE();
+    private PayCoin payC = new PayCoin();
     private ScanItem scanned = new ScanItem();
 
     public void setPaymentType(int a)
